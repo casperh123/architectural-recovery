@@ -161,7 +161,7 @@ export function renderGraph(
 
     layout: {
       name: 'dagre',
-      rankDir: 'TB',
+      rankDir: 'LR',
       nodeSep: 50,
       rankSep: 60,
       edgeSep: 80,
@@ -170,6 +170,8 @@ export function renderGraph(
   });
 
   cy.center();
+  cy.one('layoutstop', () => cy.fit(undefined, 40));
+
 
   return cy;
 }

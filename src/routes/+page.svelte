@@ -4,8 +4,9 @@
 
 	let container: HTMLDivElement | null = null;
 	let cy: any;
+  let depth = $state(3);
 
-	const graphQuery = getGraph();
+	const graphQuery = $derived(getGraph(depth));
 
 	$effect(() => {
 		(async () => {
@@ -19,12 +20,16 @@
 </script>
 
 <header class="header">
-  <div class="header-inner-wrapper max-width">
-    <h1>Hej!</h1>
-    
-    <button onclick={() => graphQuery.refresh()} class="btn">
+<div class="header-inner-wrapper max-width">
+    <button onclick={() => graphQuery.refresh()} class="btn btn-primary">
 	    Refresh graph
-    </button>
+    </button> 
+    <select class="select" bind:value={depth}>
+        <option disabled={true}>Depth</option>
+      {#each Array.from({length: 10}, (_, i) => i) as depth}
+          <option>{depth}</option>
+      {/each}
+    </select>
   </div>
 </header>
 
@@ -45,5 +50,14 @@
   }
 
   .header-inner-wrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 20px;
+  }
+  
+  .select-wrapper {
+    display: flex;
+    flex-direction: row;
   }
 </style>
