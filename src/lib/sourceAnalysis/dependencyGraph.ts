@@ -53,6 +53,8 @@ export class DependencyGraph {
   }
 
   private resolveImport(imp: string, fromFile: string): string | undefined {
+    
+
     if (imp.startsWith('.')) {
       const resolved = path.resolve(path.dirname(fromFile), imp);
       const relative = path.relative(this.rootDir, resolved);

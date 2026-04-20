@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { getGraph } from './graph.remote';
+	import { getGraph} from './graph.remote';
 	import { renderGraph } from '$lib/sourceAnalysis/renderer';
 
 	let container: HTMLDivElement | null = null;
 	let cy: any;
   let depth = $state(3);
 
+  const depthRange = Array.from({length: 10}, (_, i) => i);
 	const graphQuery = $derived(getGraph(depth));
 
 	$effect(() => {
-		(async () => {
-			const graph = await graphQuery;
+    (async () => {
+      const graph = await graphQuery;
 
-			if (cy) cy.destroy();
+      if (cy) cy.destroy();
 
-			cy = renderGraph(container!, graph);
-		})();
+      cy = renderGraph(container!, graph);
+    })();
 	});
 </script>
 
@@ -25,8 +26,8 @@
 	    Refresh graph
     </button> 
     <select class="select" bind:value={depth}>
-        <option disabled={true}>Depth</option>
-      {#each Array.from({length: 10}, (_, i) => i) as depth}
+      <option disabled={true}>Depth</option>
+      {#each depthRange as depth}
           <option>{depth}</option>
       {/each}
     </select>
