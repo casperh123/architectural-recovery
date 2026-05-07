@@ -3,11 +3,15 @@ import dagre from 'cytoscape-dagre';
 
 cytoscape.use(dagre);
 
-function graphToElements(graph: Map<string, Map<string, number>>) {
+function graphToElements(graph: Map<string, Map<string, number>>, include: Set<string> | undefined) {
   const nodes = new Map();
   const edges: any[] = [];
 
   for (const [module, deps] of graph) {
+    if (include != undefined && !include.has(module)) {
+      continue;
+    } 
+
     if (!nodes.has(module)) {
       nodes.set(module, { data: { id: module, label: module } });
     }
@@ -34,9 +38,10 @@ function graphToElements(graph: Map<string, Map<string, number>>) {
 // Thanks to ArchLens for VS Code for this very nice graph styling
 export function renderGraph(
   container: HTMLElement,
-  graph: Map<string, Map<string, number>>
+  graph: Map<string, Map<string, number>>,
+  include: Set<string> | undefined
 ) {
-  const elements = graphToElements(graph);
+  const elements = graphToElements(graph, include);
 
   const font_height = 15;
   const block_extra_length = 50;
@@ -161,11 +166,11 @@ export function renderGraph(
 
     layout: {
       name: 'dagre',
-      rankDir: 'LR',
+      rankDir: 'TB',
       nodeSep: 50,
       rankSep: 60,
       edgeSep: 80,
-      spacingFactor: 1.5
+      spacingFactor: 1
     }
   });
 

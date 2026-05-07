@@ -1,23 +1,29 @@
 import fs from 'node:fs/promises';
-import path from 'node:path';
 import * as parser from '@babel/parser';
 import _traverse from '@babel/traverse';
+import { ImportResolver } from './importResolver';
+import path from 'node:path';
 
 const traverse = (_traverse as any).default ?? _traverse;
 
 
 export class DependencyGraph {
 
+  private importResolver: ImportResolver;
+  private internalGraph: Map<string, Map<string, number>> | undefined;
+
   constructor(
-    private rootDir: string,
-    private level: number = 3
-  ) {}
+    rootDir: string,
+    level: number = 3
+  ) {
+    this.importResolver = new ImportResolver(rootDir, level)
+  }
 
   async build(filePaths: string[]): Promise<Map<string, Map<string, number>>> {
-    const graph = new Map<string, Map<string, number>>();
+    this.internalGraph = new Map<string, Map<string, number>>();
 
     for (const filePath of filePaths) {
-      const source = this.toModule(filePath);
+      const source = this.importResolver.toModule(filePath);
       if (!source) continue;
 
       const code = await this.read(filePath);
@@ -26,17 +32,52 @@ export class DependencyGraph {
       const imports = this.getImports(code);
 
       for (const imp of imports) {
-        const target = this.resolveImport(imp, filePath);
+        const target = this.importResolver.resolveImport(imp, filePath);
         if (!target || target === source) continue;
 
-        if (!graph.has(source)) graph.set(source, new Map());
+        if (!this.internalGraph.has(source)) this.internalGraph.set(source, new Map());
 
-        const deps = graph.get(source)!;
+        const deps = this.internalGraph.get(source)!;
         deps.set(target, (deps.get(target) ?? 0) + 1);
       }
     }
 
-    return graph;
+    return this.internalGraph;
+  }
+
+  public getModulePaths(): string[] {
+    if(this.internalGraph == undefined) {
+      return [];
+    }
+
+    const uniquePaths: Set<string> = new Set();
+
+    for (const modulePath of this.internalGraph?.keys()) {
+      const pathPrefixes = this.extractAllPathPrefixes(modulePath);
+
+      for(const uniquePath of pathPrefixes) {
+        uniquePaths.add(uniquePath);
+      }
+    }
+    
+    return Array.from(uniquePaths.values());
+  }
+
+  private extractAllPathPrefixes(path: string): Set<string> {
+    const parts = path.split("/");
+    const prefixes = new Set<string>();
+
+    for(let i = 0; i < parts.length; i++) {
+      const path = parts.slice(0, i).join("/");
+
+      if(path == "") {
+        continue;
+      }
+
+      prefixes.add(path);
+    }
+
+    return prefixes;
   }
 
   private async read(filePath: string) {
@@ -47,37 +88,6 @@ export class DependencyGraph {
     }
   }
 
-  private toModule(filePath: string): string {
-    const relative = path.relative(this.rootDir, filePath);
-    return this.toLevel(relative);
-  }
-
-  private resolveImport(imp: string, fromFile: string): string | undefined {
-    
-
-    if (imp.startsWith('.')) {
-      const resolved = path.resolve(path.dirname(fromFile), imp);
-      const relative = path.relative(this.rootDir, resolved);
-      return this.toLevel(relative);
-    }
-
-    if (imp.startsWith('@/')) {
-      return this.toLevel(imp.slice(2));
-    }
-
-    if (imp.startsWith('@')) {
-      const parts = imp.split('/');
-      return parts.slice(0, 2).join('/');
-    }
-
-    return undefined;
-  }
-
-  private toLevel(p: string): string {
-    const parts = p.split(path.sep).filter(Boolean);
-
-    return parts.slice(0, this.level).join('/');
-  }
 
   private getImports(code: string): string[] {
     const imports: string[] = [];

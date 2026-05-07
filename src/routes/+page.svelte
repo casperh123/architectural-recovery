@@ -5,17 +5,24 @@
 	let container: HTMLDivElement | null = null;
 	let cy: any;
   let depth = $state(3);
+  let moduleFilter: Set<string> | undefined = $state(undefined);
+  let scopedPath = $state("");
+  let modulePaths: string[] | undefined = $state(undefined);
 
   const depthRange = Array.from({length: 10}, (_, i) => i);
-	const graphQuery = $derived(getGraph(depth));
+	const graphQuery = $derived(getGraph([depth, scopedPath]));
 
 	$effect(() => {
     (async () => {
-      const graph = await graphQuery;
+      const { graph, modules } = await graphQuery;
 
+      if(modulePaths == undefined) {
+        modulePaths = modules;
+      }
+     
       if (cy) cy.destroy();
 
-      cy = renderGraph(container!, graph);
+      cy = renderGraph(container!, graph, moduleFilter);
     })();
 	});
 </script>
@@ -25,6 +32,12 @@
     <button onclick={() => graphQuery.refresh()} class="btn btn-primary">
 	    Refresh graph
     </button> 
+    <input type="text" bind:value={scopedPath} list="modules"/>
+    <datalist id="modules">
+      {#each modulePaths as module}
+        <option value={module}>{module}</option>
+      {/each}
+    </datalist>
     <select class="select" bind:value={depth}>
       <option disabled={true}>Depth</option>
       {#each depthRange as depth}
