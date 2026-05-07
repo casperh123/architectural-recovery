@@ -1,7 +1,7 @@
 export enum Layer {
-  Application = "Application",
+  Server = "Server",
   Database = "Database",
-  Infrastructure = "Infastructure",
+  Shared = "Shared",
   Presentation = "Presentation",
   External = "External",
   Unknown = "Unknown"

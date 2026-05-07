@@ -116,11 +116,12 @@ export function renderGraph(
         style: {
           'background-opacity': 0.1,
           'border-width': 2,
-          'label': 'data(label)'
-        }
+          'label': 'data(label)',
+          'padding': '40px'
+      }
       },
       {
-        selector: ':parent[layer = "Application"]',
+        selector: ':parent[layer = "Server"]',
         style: { 'background-color': '#D0E8FF', 'border-color': '#4A90D9' }
       },
       {
@@ -128,7 +129,7 @@ export function renderGraph(
         style: { 'background-color': '#D0FFD6', 'border-color': '#4AD95A' }
       },
       {
-        selector: ':parent[layer = "Infrastructure"]',
+        selector: ':parent[layer = "Shared"]',
         style: { 'background-color': '#FFF3D0', 'border-color': '#D9A84A' }
       },
       {
@@ -176,13 +177,13 @@ export function renderGraph(
   animate: false,
   nodeDimensionsIncludeLabels: true,
   elk: {
-    algorithm: 'layered',
-    'elk.direction': 'DOWN',
-    'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-    'elk.spacing.nodeNode': '80',
-    'elk.layered.compaction.onlyFinalLayersFrontsideNodeNodeBetweenLayers': 'true',
-    'elk.padding': '[top=50, left=50, bottom=50, right=50]',
-  }
+  algorithm: 'layered',
+  'org.eclipse.elk.direction': 'DOWN',
+  'org.eclipse.elk.spacing.nodeNode': '200',
+  'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers': '200',
+  'org.eclipse.elk.padding': '[top=80, left=80, bottom=80, right=80]',
+  'org.eclipse.elk.spacing.componentComponent': '200',
+}
 }
   });
   cy.center();

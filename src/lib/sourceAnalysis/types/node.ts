@@ -20,18 +20,28 @@ export class Node {
       return Layer.External;
     }
 
-    if(this.path.startsWith("db")) {
+    if(this.path.startsWith("db") || this.path.startsWith("server/db")) {
       return Layer.Database;
     }
 
     if(this.path.startsWith("server")) {
-      return Layer.Infrastructure;
+      return Layer.Server;
+    }
+
+    if(
+      this.path.startsWith("utils") ||
+      this.path.startsWith("lib") ||
+      this.path.startsWith("scripts") || 
+      this.path.startsWith("templates")
+    ) {
+        return Layer.Shared;
     }
 
     if(
       this.path.startsWith("pages") ||
       this.path.startsWith("styles") ||
-      this.path.startsWith("components")
+      this.path.startsWith("components") ||
+      this.path.startsWith("hooks")
     ) {
       return Layer.Presentation;
     }
