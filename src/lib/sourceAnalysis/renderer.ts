@@ -7,7 +7,7 @@ cytoscape.use(dagre);
 function graphToElements(
   graph: Map<string, Map<string, number>>, 
   include: Set<string> | undefined,
-  nodes: Map<string, NodeData>
+  nodes: Map<string, Node>
 ) {
   const diagramNodes = new Map();
   const layerNodes = new Map();  
@@ -18,23 +18,23 @@ function graphToElements(
     
     if (!diagramNodes.has(module)) {
       const node = nodes.get(module);
-      const layer = node?.layer ?? 'unknown';
+      const layer = node?.layer;
       
       if (!layerNodes.has(layer)) {
-        layerNodes.set(layer, { data: { id: layer, label: layer } });
+        layerNodes.set(layer, { data: { id: layer, label: layer, layer: layer } });
       }
 
       diagramNodes.set(module, { 
-        data: { id: module, label: module, layer, parent: layer } 
+        data: { id: module, label: module, layer, parent: layer, type: node?.type } 
       });
     }
 
     for (const [target, count] of deps) {
       if (!diagramNodes.has(target)) {
         const node = nodes.get(target);
-        const layer = node?.layer ?? 'unknown';
+        const layer = node?.layer;
         if (!layerNodes.has(layer)) {
-          layerNodes.set(layer, { data: { id: layer, label: layer } });
+          layerNodes.set(layer, { data: { id: layer, label: layer, layer: layer } });
         }
         diagramNodes.set(target, { 
           data: { id: target, label: target, layer, parent: layer } 
@@ -57,28 +57,17 @@ export function renderGraph(
   nodes: Map<string, Node>
 ) {
   const elements = graphToElements(graph, include, nodes);
-
   const font_height = 15;
   const block_extra_length = 50;
   const font_width = font_height * 0.61;
   const border_width = 2;
-
   function getLabelLength(node: any) {
     return node.data('label')?.length ?? 0;
   }
-
   const cy = cytoscape({
     container,
     elements,
     style: [
-      {
-        selector: ':parent',
-        style: { 
-          'background-opacity': 0.1, 
-          'border-width': 2,
-          'label': 'data(label)'
-        }
-      },
       {
         selector: 'node',
         style: {
@@ -119,6 +108,38 @@ export function renderGraph(
           'font-family': 'monospace',
           'font-size': font_height
         }
+      },
+      {
+        selector: ':parent',
+        style: {
+          'background-opacity': 0.1,
+          'border-width': 2,
+          'label': 'data(label)'
+        }
+      },
+      {
+        selector: ':parent[layer = "Application"]',
+        style: { 'background-color': '#D0E8FF', 'border-color': '#4A90D9' }
+      },
+      {
+        selector: ':parent[layer = "Database"]',
+        style: { 'background-color': '#D0FFD6', 'border-color': '#4AD95A' }
+      },
+      {
+        selector: ':parent[layer = "Infrastructure"]',
+        style: { 'background-color': '#FFF3D0', 'border-color': '#D9A84A' }
+      },
+      {
+        selector: ':parent[layer = "Presentation"]',
+        style: { 'background-color': '#F0D0FF', 'border-color': '#A84AD9' }
+      },
+      {
+        selector: ':parent[layer = "External"]',
+        style: { 'background-color': '#FFD0D0', 'border-color': '#D94A4A' }
+      },
+      {
+        selector: ':parent[layer = "Unknown"]',
+        style: { 'background-color': '#F0F0F0', 'border-color': '#999999' }
       },
       {
         selector: 'edge',

@@ -4,6 +4,7 @@ export class ImportResolver {
 
   constructor(
     private rootDir: string,
+    private filterDir: string,
     private depth: number
   ) {
 

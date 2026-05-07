@@ -3,5 +3,6 @@ export enum Layer {
   Database = "Database",
   Infrastructure = "Infastructure",
   Presentation = "Presentation",
+  External = "External",
   Unknown = "Unknown"
 }

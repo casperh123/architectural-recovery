@@ -16,6 +16,10 @@ export class Node {
   }
 
   private determineLayer(): Layer {
+    if(this.path.startsWith("@") && (!this.path.startsWith("@dokploy") || !this.path.startsWith("@/dokploy"))) {
+      return Layer.External;
+    }
+
     if(this.path.startsWith("db")) {
       return Layer.Database;
     }
@@ -24,8 +28,15 @@ export class Node {
       return Layer.Infrastructure;
     }
 
+    if(
+      this.path.startsWith("pages") ||
+      this.path.startsWith("styles") ||
+      this.path.startsWith("components")
+    ) {
+      return Layer.Presentation;
+    }
 
-    return Layer.Unknown;
+   return Layer.Unknown;
   }
 
 

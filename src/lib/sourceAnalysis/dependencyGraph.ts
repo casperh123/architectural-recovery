@@ -15,9 +15,10 @@ export class DependencyGraph {
 
   constructor(
     rootDir: string,
+    filterDir: string,
     level: number = 3
   ) {
-    this.importResolver = new ImportResolver(rootDir, level);
+    this.importResolver = new ImportResolver(rootDir, filterDir, level);
     this.nodes = new Map<string, Node>;
   }
 

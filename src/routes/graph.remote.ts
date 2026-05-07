@@ -8,17 +8,13 @@ import z from "zod";
 export const getGraph = query(
   z.tuple([z.int(), z.string()]),
   async (args) => {
-    let filePath = path.join(__baseDir, "../../libs/dokploy");
+    const baseDir = path.join(__baseDir, "../../libs/dokploy");
     const focusedPath = args[1];
+    const filePath = focusedPath !== "" ? path.join(baseDir, focusedPath) : baseDir
 
-    if(focusedPath != "") {
-      filePath = path.join(filePath, focusedPath);
-    }
-
-    if (filePath === "") return new Map();
     const explorer = new FileExplorer();
     const files = await explorer.getJavaScriptFiles(filePath);
-    const dependencyGraph = new DependencyGraph(filePath, args[0]);
+    const dependencyGraph = new DependencyGraph(baseDir, filePath, args[0]);
     const graph = await dependencyGraph.build(files);
     const modules = dependencyGraph.getModulePaths();
     const nodes = new Map(
