@@ -14,7 +14,7 @@
 
 	$effect(() => {
     (async () => {
-      const { graph, modules } = await graphQuery;
+      const { graph, modules, nodes } = await graphQuery;
 
       if(modulePaths == undefined) {
         modulePaths = modules;
@@ -22,7 +22,7 @@
      
       if (cy) cy.destroy();
 
-      cy = renderGraph(container!, graph, moduleFilter);
+      cy = renderGraph(container!, graph, moduleFilter, nodes);
     })();
 	});
 </script>

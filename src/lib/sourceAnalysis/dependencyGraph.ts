@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import * as parser from '@babel/parser';
 import _traverse from '@babel/traverse';
 import { ImportResolver } from './importResolver';
-import path from 'node:path';
+import { Node } from './types/node';
 
 const traverse = (_traverse as any).default ?? _traverse;
 
@@ -11,38 +11,52 @@ export class DependencyGraph {
 
   private importResolver: ImportResolver;
   private internalGraph: Map<string, Map<string, number>> | undefined;
+  private nodes: Map<string, Node>;
 
   constructor(
     rootDir: string,
     level: number = 3
   ) {
-    this.importResolver = new ImportResolver(rootDir, level)
+    this.importResolver = new ImportResolver(rootDir, level);
+    this.nodes = new Map<string, Node>;
   }
 
   async build(filePaths: string[]): Promise<Map<string, Map<string, number>>> {
     this.internalGraph = new Map<string, Map<string, number>>();
 
     for (const filePath of filePaths) {
-      const source = this.importResolver.toModule(filePath);
-      if (!source) continue;
+      const sourcePath = this.importResolver.toModule(filePath);
+
+      if (!this.nodes.has(sourcePath)) {
+        this.nodes.set(sourcePath, new Node(sourcePath));
+      }
 
       const code = await this.read(filePath);
       if (!code) continue;
 
-      const imports = this.getImports(code);
+      const { imports, loc } = this.getProgramInformation(code);
 
       for (const imp of imports) {
         const target = this.importResolver.resolveImport(imp, filePath);
-        if (!target || target === source) continue;
+        
+        if (!target || target === sourcePath) continue;
 
-        if (!this.internalGraph.has(source)) this.internalGraph.set(source, new Map());
+        if(!this.nodes.has(target)) {
+          this.nodes.set(target, new Node(target));
+        }
 
-        const deps = this.internalGraph.get(source)!;
+        if (!this.internalGraph.has(sourcePath)) this.internalGraph.set(sourcePath, new Map());
+
+        const deps = this.internalGraph.get(sourcePath)!;
         deps.set(target, (deps.get(target) ?? 0) + 1);
       }
     }
 
     return this.internalGraph;
+  }
+
+  public getNodes(): Map<string, Node> {
+    return this.nodes;
   }
 
   public getModulePaths(): string[] {
@@ -89,8 +103,9 @@ export class DependencyGraph {
   }
 
 
-  private getImports(code: string): string[] {
+  private getProgramInformation(code: string): { imports: string[], loc: number} {
     const imports: string[] = [];
+    let loc = 0;
 
     try {
       const ast = parser.parse(code, {
@@ -105,6 +120,6 @@ export class DependencyGraph {
       });
     } catch {}
 
-    return imports;
+    return { imports, loc};
   }
 }

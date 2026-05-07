@@ -1,16 +1,18 @@
+import { DependencyType } from "./dependencyType";
 import { Layer } from "./layer";
 
 
 export class Node {
   public layer: Layer
   public type: DependencyType
+  public loc: number;
   
   constructor(    
-    public name: string,
     public path: string,
-    public loc: number) {
+  ) {
     this.layer = this.determineLayer();
     this.type = this.determineType();
+    this.loc = 0;
   }
 
   private determineLayer(): Layer {
@@ -18,19 +20,29 @@ export class Node {
       return Layer.Database;
     }
 
+    if(this.path.startsWith("server")) {
+      return Layer.Infrastructure;
+    }
+
+
     return Layer.Unknown;
   }
 
 
   private determineType(): DependencyType {
-    if(this.path.startsWith("@")) {
+    if(this.path.startsWith("@") && (!this.path.startsWith("@dokploy") || !this.path.startsWith("@/dokploy"))) {
       return DependencyType.Exernal;
     }
 
-    if(this.path.startsWith("/")) {
-      return DependencyType.Internal;
-    }
-      
-    return DependencyType.Unknown;
+    return DependencyType.Internal;
+  }
+
+  public toJSON() {
+    return {
+      path: this.path,
+      layer: this.layer,
+      type: this.type,
+      loc: this.loc
+    };
   }
 }

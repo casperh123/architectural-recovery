@@ -25,7 +25,7 @@ export class ImportResolver {
 
     if(imp.startsWith("@dokploy") || imp.startsWith("@/dokploy")) {
       const parts = imp.split('/');
-      return parts.slice(0, 1 + this.depth).join('/')
+      return parts.slice(1, this.depth).join('/')
     }
 
     if (imp.startsWith('@/')) {

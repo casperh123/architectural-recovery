@@ -21,9 +21,12 @@ export const getGraph = query(
     const dependencyGraph = new DependencyGraph(filePath, args[0]);
     const graph = await dependencyGraph.build(files);
     const modules = dependencyGraph.getModulePaths();
+    const nodes = new Map(
+      [...dependencyGraph.getNodes().entries()].map(([k, v]) => [k, v.toJSON()])
+    );
 
-    console.log(modules);
-
-    return {graph, modules};
+    console.log(nodes);
+    
+    return { graph, nodes, modules };
   }
 );
