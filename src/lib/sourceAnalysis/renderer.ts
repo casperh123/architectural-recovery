@@ -1,8 +1,10 @@
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
+import elk from 'cytoscape-elk';
+import coseBilkent from 'cytoscape-cose-bilkent';
 import type { Node } from './types/node';
 
-cytoscape.use(dagre);
+cytoscape.use(elk);
 
 function graphToElements(
   graph: Map<string, Map<string, number>>, 
@@ -170,13 +172,18 @@ export function renderGraph(
       }
     ],
     layout: {
-      name: 'dagre',
-      rankDir: 'TB',
-      nodeSep: 50,
-      rankSep: 60,
-      edgeSep: 80,
-      spacingFactor: 1
-    }
+  name: 'elk',
+  animate: false,
+  nodeDimensionsIncludeLabels: true,
+  elk: {
+    algorithm: 'layered',
+    'elk.direction': 'DOWN',
+    'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+    'elk.spacing.nodeNode': '80',
+    'elk.layered.compaction.onlyFinalLayersFrontsideNodeNodeBetweenLayers': 'true',
+    'elk.padding': '[top=50, left=50, bottom=50, right=50]',
+  }
+}
   });
   cy.center();
   cy.one('layoutstop', () => cy.fit(undefined, 40));

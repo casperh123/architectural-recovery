@@ -23,6 +23,7 @@
       if (cy) cy.destroy();
 
       cy = renderGraph(container!, graph, moduleFilter, nodes);
+      cy.one('layoutstop', () => cy.fit(undefined, 20));
     })();
 	});
 </script>

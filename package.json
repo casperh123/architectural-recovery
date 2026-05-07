@@ -41,7 +41,9 @@
 	},
 	"dependencies": {
 		"@babel/traverse": "^7.29.0",
+		"cytoscape-cose-bilkent": "^4.1.0",
 		"cytoscape-dagre": "^2.5.0",
+		"cytoscape-elk": "^2.3.0",
 		"daisyui": "^5.5.19",
 		"zod": "^4.3.6"
 	}

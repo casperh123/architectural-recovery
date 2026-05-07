@@ -34,7 +34,8 @@ export class ImportResolver {
     }
 
     if (imp.startsWith('@')) {
-      return this.toLevel(imp);      
+      const parts = imp.split('/');
+      return parts[0];
     }
 
     return undefined;
