@@ -51,7 +51,7 @@
 {#if graphQuery.loading}
 	<p>Loading...</p>
 {:else}
-	<div bind:this={container} style="height: 100vh;"></div>
+	<div bind:this={container} style="height: 100vh; background-color: #636363;"></div>
 {/if}
 
 <style>

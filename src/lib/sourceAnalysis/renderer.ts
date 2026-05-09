@@ -183,12 +183,15 @@ export function renderGraph(
   animate: false,
   nodeDimensionsIncludeLabels: true,
   elk: {
-  algorithm: 'layered',
+  algorithm: 'stress',
   'org.eclipse.elk.direction': 'DOWN',
-  'org.eclipse.elk.spacing.nodeNode': '200',
+  'org.eclipse.elk.spacing.nodeNode': '80',
   'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers': '200',
   'org.eclipse.elk.padding': '[top=80, left=80, bottom=80, right=80]',
   'org.eclipse.elk.spacing.componentComponent': '200',
+  'org.eclipse.elk.layered.mergeEdges': 'true',
+  'org.eclipse.elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+  'org.eclipse.elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
 }
 }
   });

@@ -8,7 +8,7 @@ export class Node {
   public loc: number;
 
   private ignorePrefixes = new Set([
-    "styles",
+    "style",
     "package.json"
   ]);
 
@@ -43,7 +43,7 @@ export class Node {
 
   private determineLayer(): Layer {
     if(this.path.startsWith("@") && (!this.path.startsWith("@dokploy") || !this.path.startsWith("@/dokploy"))) {
-      return Layer.Ignore;
+      return Layer.External;
     }
 
     const prefix: string = this.path.split("/")[0];
