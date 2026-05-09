@@ -4,5 +4,6 @@ export enum Layer {
   Shared = "Shared",
   Presentation = "Presentation",
   External = "External",
-  Unknown = "Unknown"
+  Unknown = "Unknown",
+  Ignore = "Ignore"
 }

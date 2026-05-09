@@ -6,6 +6,32 @@ export class Node {
   public layer: Layer
   public type: DependencyType
   public loc: number;
+
+  private ignorePrefixes = new Set([
+    "styles",
+    "package.json"
+  ]);
+
+  private presentationPrefixes = new Set([
+    "pages",
+    "components",
+    "hooks",
+    "lib"
+  ]);
+
+  private sharedPrefixes = new Set([
+    "utils",
+    "templates",
+    "scripts"
+  ]);
+
+  private serverPrefixes = new Set([
+    "server"
+  ]);
+
+  private databasePrefixes = new Set([
+    "db"
+  ]);
   
   constructor(    
     public path: string,
@@ -17,33 +43,29 @@ export class Node {
 
   private determineLayer(): Layer {
     if(this.path.startsWith("@") && (!this.path.startsWith("@dokploy") || !this.path.startsWith("@/dokploy"))) {
-      return Layer.External;
+      return Layer.Ignore;
     }
 
-    if(this.path.startsWith("db") || this.path.startsWith("server/db")) {
+    const prefix: string = this.path.split("/")[0];
+
+    if(this.ignorePrefixes.has(prefix)) {
+      return Layer.Ignore;
+    }
+
+    if(this.presentationPrefixes.has(prefix)) {
+      return Layer.Presentation;
+    }
+
+    if(this.databasePrefixes.has(prefix) || this.path.startsWith("server/db")) {
       return Layer.Database;
     }
 
-    if(this.path.startsWith("server")) {
+    if(this.serverPrefixes.has(prefix)) {
       return Layer.Server;
     }
 
-    if(
-      this.path.startsWith("utils") ||
-      this.path.startsWith("lib") ||
-      this.path.startsWith("scripts") || 
-      this.path.startsWith("templates")
-    ) {
+    if(this.sharedPrefixes.has(prefix)) {
         return Layer.Shared;
-    }
-
-    if(
-      this.path.startsWith("pages") ||
-      this.path.startsWith("styles") ||
-      this.path.startsWith("components") ||
-      this.path.startsWith("hooks")
-    ) {
-      return Layer.Presentation;
     }
 
    return Layer.Unknown;

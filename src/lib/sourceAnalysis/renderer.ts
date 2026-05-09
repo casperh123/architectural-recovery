@@ -3,6 +3,7 @@ import dagre from 'cytoscape-dagre';
 import elk from 'cytoscape-elk';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type { Node } from './types/node';
+import { Layer } from './types/layer';
 
 cytoscape.use(elk);
 
@@ -17,12 +18,14 @@ function graphToElements(
 
   for (const [module, deps] of graph) {
     if (include != undefined && !include.has(module)) continue;
-    
+
     if (!diagramNodes.has(module)) {
       const node = nodes.get(module);
       const layer = node?.layer;
+
+      if(layer == Layer.Ignore) continue;
       
-      if (!layerNodes.has(layer)) {
+      if(!layerNodes.has(layer)) {
         layerNodes.set(layer, { data: { id: layer, label: layer, layer: layer } });
       }
 
@@ -35,6 +38,9 @@ function graphToElements(
       if (!diagramNodes.has(target)) {
         const node = nodes.get(target);
         const layer = node?.layer;
+
+        if(layer == Layer.Ignore) continue;
+
         if (!layerNodes.has(layer)) {
           layerNodes.set(layer, { data: { id: layer, label: layer, layer: layer } });
         }
